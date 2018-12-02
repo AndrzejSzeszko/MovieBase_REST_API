@@ -74,19 +74,19 @@ class MovieTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Movie.objects.count(), len(response.data))
 
-    def test_get_movie_detail(self):
+    def test1_get_movie_detail(self):
         response = self.client.get("/movies/1/", {}, format='json')
         self.assertEqual(response.status_code, 200)
         for field in ["title", "year", "description", "director", "actors"]:
             self.assertIn(field, response.data)
 
-    def test_delete_movie(self):
+    def test3_delete_movie(self):
         response = self.client.delete("/movies/1/", {}, format='json')
         self.assertEqual(response.status_code, 204)
         movie_ids = [movie.id for movie in Movie.objects.all()]
         self.assertNotIn(1, movie_ids)
 
-    def test_update_movie(self):
+    def test2_update_movie(self):
         response = self.client.get("/movies/1/", {}, format='json')
         movie_data = response.data
         new_year = 3
