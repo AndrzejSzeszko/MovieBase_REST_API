@@ -22,8 +22,8 @@ from showtimes.views import CinemaListView, CinemaView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^movies/$', MovieListView.as_view()),
-    url(r'^movies/(?P<pk>[0-9]+)/$', MovieView.as_view()),
-    url(r'^cinemas/$', CinemaListView.as_view()),
-    url(r'^cinemas/(?P<pk>[0-9]+)/$', CinemaView.as_view()),
+    url(r'^movies/$', MovieListView.as_view(), name='movie'),
+    url(r'^movies/(?P<pk>[0-9]+)/$', MovieView.as_view(), name='movie-detail'),
+    url(r'^cinemas/$', CinemaListView.as_view(), name='cinemas'),
+    url(r'^cinemas/(?P<pk>[0-9]+)/$', CinemaView.as_view(), name='cinema-detail'),
 ]
