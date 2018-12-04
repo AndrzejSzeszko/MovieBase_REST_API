@@ -7,9 +7,9 @@ from .models import (
 
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
-    pass
+    list_display = [field.name for field in Movie._meta.fields if field.name != 'id']
 
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    pass
+    list_display = [field.name for field in Person._meta.fields if field.name != 'id']
