@@ -1,5 +1,6 @@
 #!/usr/bin/python3.7
 from rest_framework import serializers
+from movielist.models import Movie
 from showtimes.models import (
     Cinema,
     Screening
@@ -7,13 +8,21 @@ from showtimes.models import (
 
 
 class CinemaSerializer(serializers.ModelSerializer):
+    movies = serializers.HyperlinkedRelatedField(
+        view_name='screening-detail',
+        queryset=Screening.objects.all(),
+        many=True,
+        allow_null=True
+    )
 
     class Meta:
         model = Cinema
-        exclude = ['movies']
+        fields = '__all__'
 
 
 class ScreeningSerializer(serializers.ModelSerializer):
+    cinema = serializers.SlugRelatedField(slug_field='name', queryset=Cinema.objects.all())
+    movie = serializers.SlugRelatedField(slug_field='title', queryset=Movie.objects.all())
 
     class Meta:
         model = Screening
