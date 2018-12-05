@@ -70,9 +70,39 @@ class ShowtimesTestCase(APITestCase):
                 )
             )
 
-    def test_add_cinema(self):
+    def test1_list_cinemas(self):
+        response = self.client.get('/cinemas/', {}, format='json')
+        self.assertEqual(response.status_code, 200)
+
+    def test2_cinema_details(self):
+        response = self.client.get('/cinemas/1/', {}, format='json')
+        self.assertEqual(response.status_code, 200)
+
+    def test3_add_cinema(self):
         new_cinema_data = self._fake_cinema_data()
-        response = self.client.post('')
+        response = self.client.post('/cinemas/', new_cinema_data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Cinema.objects.filter(**new_cinema_data).count(), 1)
+
+    def test4_update_cinema(self):
+        updated_cinema_data = self._fake_cinema_data()
+        response = self.client.patch('/cinemas/1/', updated_cinema_data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Cinema.objects.filter(**updated_cinema_data).count(), 1)
+
+    def test5_update_non_existing_cinema(self):
+        updated_cinema_data = self._fake_cinema_data()
+        response = self.client.patch('/cinemas/9999999999999999999999999999/', updated_cinema_data, format='json')
+        self.assertEqual(response.status_code, 404)
+
+    def test6_delete_cinema(self):
+        response = self.client.delete('/cinemas/1/', {}, format='json')
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Cinema.objects.filter(pk=1).count(), 0)
+
+    def test7_delete_non_existing_cinema(self):
+        response = self.client.delete('/cinemas/9999999999999999999999999999/', {}, format='json')
+        self.assertEqual(response.status_code, 404)
 
     @classmethod
     def tearDownClass(cls):
