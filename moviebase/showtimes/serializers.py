@@ -9,8 +9,8 @@ from showtimes.models import (
 
 class CinemaSerializer(serializers.ModelSerializer):
     movies = serializers.HyperlinkedRelatedField(
-        view_name='screening-detail',
-        queryset=Screening.objects.all(),
+        view_name='movie-detail',
+        queryset=Movie.objects.all(),
         many=True,
         allow_null=True
     )
