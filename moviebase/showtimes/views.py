@@ -4,6 +4,7 @@ from showtimes.models import (
 )
 from showtimes.serializers import (
     CinemaSerializer,
+    CinemaWithMoviesPlayedInNearest30DaysSerializer,
     ScreeningSerializer
 )
 from rest_framework import generics
@@ -12,6 +13,11 @@ from rest_framework import generics
 class CinemaListView(generics.ListCreateAPIView):
     queryset = Cinema.objects.all()
     serializer_class = CinemaSerializer
+
+
+class CinemaWithMoviesPlayedInNearest30DaysView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Cinema.objects.all()
+    serializer_class = CinemaWithMoviesPlayedInNearest30DaysSerializer
 
 
 class CinemaView(generics.RetrieveUpdateDestroyAPIView):
