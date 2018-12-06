@@ -1,5 +1,9 @@
 #!/usr/bin/python3.7
 from rest_framework import serializers
+from datetime import (
+    datetime,
+    timedelta
+)
 from movielist.models import Movie
 from showtimes.models import (
     Cinema,
@@ -26,4 +30,22 @@ class ScreeningSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Screening
+        fields = '__all__'
+
+
+class CinemaWithMoviesPlayedInNearest30DaysSerializer(serializers.ModelSerializer):
+    movies = serializers.SerializerMethodField()
+
+    def get_movies(self, obj):
+        start_day = datetime.now()
+        end_day = start_day + timedelta(30)
+        return [
+            movie.title for movie in obj.movies.filter(
+                screening__date__gte=start_day,
+                screening__date__lt=end_day,
+            )
+        ]
+
+    class Meta:
+        model = Cinema
         fields = '__all__'
