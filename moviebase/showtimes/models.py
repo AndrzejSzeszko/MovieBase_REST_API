@@ -10,6 +10,9 @@ class Cinema(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        unique_together = ['name', 'city']
+
 
 class Screening(models.Model):
     cinema = models.ForeignKey(Cinema, on_delete=models.CASCADE)
