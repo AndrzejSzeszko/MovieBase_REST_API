@@ -1,7 +1,11 @@
 from django.test import TestCase
 from faker import Faker
 import random
-from datetime import datetime
+import json
+from datetime import (
+    datetime,
+    timedelta
+)
 from rest_framework.test import APITestCase
 from .models import (
     Cinema,
@@ -18,6 +22,7 @@ class ShowtimesTestCase(APITestCase):
     
     @classmethod
     def setUpClass(cls):
+        print('setUpClass')
 
         for _ in range(4):
             Person.objects.create(**cls._fake_person_data())
@@ -100,24 +105,24 @@ class ShowtimesTestCase(APITestCase):
         response = self.client.patch('/cinemas/9999999999999999999999999999/', updated_cinema_data, format='json')
         self.assertEqual(response.status_code, 404)
 
-    def test6_delete_cinema(self):
+    def test_e_delete_cinema(self):
         response = self.client.delete('/cinemas/1/', {}, format='json')
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Cinema.objects.filter(pk=1).count(), 0)
 
-    def test_e_delete_non_existing_cinema(self):
+    def test_f_delete_non_existing_cinema(self):
         response = self.client.delete('/cinemas/9999999999999999999999999999/', {}, format='json')
         self.assertEqual(response.status_code, 404)
 
-    def test_f_list_screenings(self):
+    def test_g_list_screenings(self):
         response = self.client.get('/screenings/', {}, format='json')
         self.assertEqual(response.status_code, 200)
 
-    def test_g_screening_details(self):
+    def test_h_screening_details(self):
         response = self.client.get('/screenings/1/', {}, format='json')
         self.assertEqual(response.status_code, 200)
 
-    def test_h_add_screening(self):
+    def test_i_add_screening(self):
         new_screening_data = self._fake_screening_data(
             cinema=random.choice(Cinema.objects.all()),
             movie=random.choice(Movie.objects.all())
@@ -133,7 +138,7 @@ class ShowtimesTestCase(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Screening.objects.filter(**new_screening_data).count(), 1)
 
-    def test_i_update_screening(self):
+    def test_j_update_screening(self):
         updated_screening_data = self._fake_screening_data(
             cinema=random.choice(Cinema.objects.all()),
             movie=random.choice(Movie.objects.all())
@@ -149,7 +154,7 @@ class ShowtimesTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Screening.objects.filter(**updated_screening_data).count(), 1)
 
-    def test_j_update_non_existing_screening(self):
+    def test_k_update_non_existing_screening(self):
         updated_screening_data = self._fake_screening_data(
             cinema=random.choice(Cinema.objects.all()),
             movie=random.choice(Movie.objects.all())
@@ -164,16 +169,38 @@ class ShowtimesTestCase(APITestCase):
         response = self.client.patch('/screenings/9999999999999999999999999999/', updated_screening_json_data, format='json')
         self.assertEqual(response.status_code, 404)
 
-    def test_k_delete_screening(self):
+    def test_l_delete_screening(self):
         response = self.client.delete('/screenings/1/', {}, format='json')
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Screening.objects.filter(pk=1).count(), 0)
 
-    def test_l_delete_non_existing_screening(self):
+    def test_m_delete_non_existing_screening(self):
         response = self.client.delete('/screenings/9999999999999999999999999999/', {}, format='json')
         self.assertEqual(response.status_code, 404)
 
+    def test_n_get_cinemas_with_movies_played_in_nearest_30_days_when_such_a_movies_exist(self):
+        cinema = Cinema.objects.filter(pk=2).first()
+        movie = Movie.objects.filter(pk=2).first()
+        Screening.objects.create(
+            cinema=cinema,
+            movie=movie,
+            date=datetime.now() + timedelta(15)
+        )
+        response = self.client.get('/cinemas_current_movies/2/', {}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(movie.title, json.loads(response.content)['movies'])
+
+    def test_n_get_cinemas_with_movies_played_in_nearest_30_days_when_such_a_movies_does_not_exist(self):
+        start_day = datetime.now()
+        end_day = start_day + timedelta(30)
+        Movie.objects.filter(
+            screening__date__gte=start_day,
+            screening__date__lt=end_day
+        ).delete()
+        response = self.client.get('/cinemas_current_movies/2/', {}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content)['movies'], [])
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        print('tearDownClass')
