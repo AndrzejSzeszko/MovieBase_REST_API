@@ -24,7 +24,8 @@ from showtimes.views import (
     CinemaListView,
     CinemaView,
     ScreeningListView,
-    ScreeningView
+    ScreeningView,
+    CinemaWithMoviesPlayedInNearest30DaysView
 )
 
 
@@ -34,6 +35,7 @@ urlpatterns = [
     url(r'^movies/(?P<pk>[0-9]+)/$', MovieView.as_view(), name='movie-detail'),
     url(r'^cinemas/$', CinemaListView.as_view(), name='cinemas'),
     url(r'^cinemas/(?P<pk>[0-9]+)/$', CinemaView.as_view(), name='cinema-detail'),
+    url(r'^cinemas_current_movies/(?P<pk>[0-9]+)/$', CinemaWithMoviesPlayedInNearest30DaysView.as_view(), name='cinema-current-movies-detail'),
     url(r'^screenings/$', ScreeningListView.as_view(), name='screenings'),
     url(r'^screenings/(?P<pk>[0-9]+)/$', ScreeningView.as_view(), name='screening-detail'),
 ]
