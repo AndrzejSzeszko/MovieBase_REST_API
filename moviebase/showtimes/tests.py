@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core import serializers
 from faker import Faker
 import random
 import json
@@ -190,7 +191,7 @@ class ShowtimesTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(movie.title, json.loads(response.content)['movies'])
 
-    def test_n_get_cinemas_with_movies_played_in_nearest_30_days_when_such_a_movies_does_not_exist(self):
+    def test_o_get_cinemas_with_movies_played_in_nearest_30_days_when_such_a_movies_does_not_exist(self):
         start_day = datetime.now()
         end_day = start_day + timedelta(30)
         Movie.objects.filter(
@@ -200,6 +201,124 @@ class ShowtimesTestCase(APITestCase):
         response = self.client.get('/cinemas_current_movies/2/', {}, format='json')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.content)['movies'], [])
+
+    def test_p_get_screenings_of_given_existing_cinema(self):
+        cinema = Cinema.objects.all().first()
+        screenings = Screening.objects.filter(cinema__name=cinema.name)
+        response = self.client.get(
+            '/screenings/',
+            {
+                'cinema__name': cinema.name,
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        for screening_obj in json.loads(serializers.serialize('json', screenings)):
+            screening_obj_cleaned = screening_obj['fields']
+            screening_obj_cleaned.update(
+                {
+                    'id': screening_obj['pk'],
+                    'cinema': Cinema.objects.get(pk=screening_obj_cleaned['cinema']).name,
+                    'movie': Movie.objects.get(pk=screening_obj_cleaned['movie']).title
+                }
+            )
+            self.assertIn(json.loads(json.dumps(screening_obj_cleaned)), json.loads(response.content))
+
+    def test_q_get_screenings_of_given_non_existing_cinema(self):
+        response = self.client.get(
+            '/screenings/',
+            {
+                'cinema__name': '....non-existing-cinema-name_jisbhb!!@@##$$',
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), [])
+
+    def test_r_get_screenings_of_given_existing_movie(self):
+        movie = Movie.objects.all().first()
+        screenings = Screening.objects.filter(movie__title=movie.title)
+        response = self.client.get(
+            '/screenings/',
+            {
+                'movie__title': movie.title,
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        for screening_obj in json.loads(serializers.serialize('json', screenings)):
+            screening_obj_cleaned = screening_obj['fields']
+            screening_obj_cleaned.update(
+                {
+                    'id': screening_obj['pk'],
+                    'cinema': Cinema.objects.get(pk=screening_obj_cleaned['cinema']).name,
+                    'movie': Movie.objects.get(pk=screening_obj_cleaned['movie']).title
+                }
+            )
+            self.assertIn(json.loads(json.dumps(screening_obj_cleaned)), json.loads(response.content))
+
+    def test_s_get_screenings_of_given_non_existing_movie(self):
+        response = self.client.get(
+            '/screenings/',
+            {
+                'movie__title': '....non-existing-movie-title_oiwnvnwevnw889!!@@##$$',
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), [])
+
+    def test_t_get_screenings_of_given_existing_cinema_and_movie(self):
+        cinema = Cinema.objects.all().first()
+        movie = Movie.objects.all().first()
+        new_screening_data = self._fake_screening_data(cinema, movie)
+        screening = Screening.objects.create(**new_screening_data)
+        response = self.client.get(
+            '/screenings/',
+            {
+                'cinema__name': screening.cinema.name,
+                'movie__title': screening.movie.title,
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        new_screening_json_data = dict(new_screening_data)
+        new_screening_json_data.update(
+            {
+                'id': screening.id,
+                'cinema': cinema.name,
+                'movie': movie.title,
+                'screening_room': str(screening.screening_room),
+                'date': new_screening_data['date'].isoformat() + 'Z'
+            }
+        )
+        self.assertIn(json.loads(json.dumps(new_screening_json_data)), json.loads(response.content))
+
+    def test_u_get_screenings_of_given_existing_cinema_and_non_existing_movie(self):
+        cinema = Cinema.objects.all().first()
+        response = self.client.get(
+            '/screenings/',
+            {
+                'cinema__name': cinema.name,
+                'movie__title': '....non-existing-movie-title_oiwnvnwevnw889!!@@##$$',
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), [])
+
+    def test_u_get_screenings_of_given_existing_movie_and_non_existing_cinema(self):
+        movie = Movie.objects.all().first()
+        response = self.client.get(
+            '/screenings/',
+            {
+                'cinema__name': '....non-existing-cinema-name_oiwnvnwevnw889!!@@##$$',
+                'movie__title': movie.title,
+            },
+            format='json'
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), [])
 
     @classmethod
     def tearDownClass(cls):
