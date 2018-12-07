@@ -1,14 +1,15 @@
+from rest_framework import generics
+
 from showtimes.models import (
     Cinema,
     Screening,
 )
+
 from showtimes.serializers import (
     CinemaSerializer,
     CinemaWithMoviesPlayedInNearest30DaysSerializer,
     ScreeningSerializer
 )
-from rest_framework import generics
-from django_filters.rest_framework import DjangoFilterBackend
 
 
 class CinemaListView(generics.ListCreateAPIView):
