@@ -58,7 +58,7 @@ Create superuser:
 ```
 $ python manage.py createsuperuser
 ```
-Run server lacally:
+Run server locally:
 ```
 $ python manage.py runserver
 ```
@@ -69,7 +69,7 @@ Get all movies (method: GET), create new movie (method: POST):
 ```
 /movies/
 ```
-Get (GET), update (PUT) and delete (DELETE) paticular movie:
+Get (GET), update (PUT) and delete (DELETE) particular movie:
 ```
 /movies/movie_id/
 e.g. /movies/12/
@@ -78,12 +78,12 @@ Get all cinemas (GET), create new cinema (POST):
 ```
 /cinemas/
 ```
-Get (GET), update (PUT) and delete (DELETE) paticular cinema:
+Get (GET), update (PUT) and delete (DELETE) particular cinema:
 ```
 /cinemas/cinema_id/
 e.g. /cinema/11/
 ```
-Get (GET), update (PUT) and delete (DELETE) paticular cinema, but in "movies" key show only movies screened within nearest 30 days:
+Get (GET), update (PUT) and delete (DELETE) particular cinema, but in "movies" key show only movies screened within nearest 30 days:
 ```
 /cinemas_current_movies/cinema_id/
 e.g. /cinemas_current_movies/11/
@@ -107,7 +107,7 @@ Get all screenings with given cinema name and movie title (GET), create new scre
 /screenings/?movie_title=yyy&cinema__name=xxx/
 e.g. /screenings/?movie_title=Arrival&cinema__name=Femina/
 ```
-Get (GET), update (PUT) and delete (DELETE) paticular screening:
+Get (GET), update (PUT) and delete (DELETE) particular screening:
 ```
 /screenings/screening_id/
 e.g. /screenings/11/
