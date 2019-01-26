@@ -45,6 +45,15 @@ $ git clone https://github.com/AndrzejSzeszko/MovieBase_REST_API.git
 ```
 or download and unzip compressed version (button "clone or download" -> "download zip" on project's main page).
 
+Navigate to directory that contains "requirements.txt" file:
+```
+$ cd path/to/directory/that/contains/metioned/file
+```
+Install required packages:
+```
+$ pip install -r requirements.txt
+```
+
 Navigate to directory that contains "manage.py" file:
 ```
 $ cd path/to/directory/that/contains/metioned/file
